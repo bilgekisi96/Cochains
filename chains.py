@@ -1,6 +1,6 @@
 import numpy as np
 
-chars = "abcçdefgğhıijklmnoöprsştuüvyzABCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVYZ0123456789.,!?;:-()[]{}\"'/%&+=*@#\n\t "
+chars = "aâbcçdefgğhıîijklmnoöprsştuûüvyzAÂBCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVYZ0123456789.,!?;:-()[]{}\"'/%&+=*@#\n\t\x85 "
 
 chars = sorted(set(chars))
 
@@ -11,14 +11,29 @@ embedding_dim = 8
 
 embedding_matrix = np.random.randn(len(chars), embedding_dim)
 
-kelime = "MER"
 
-vectors = []
+with open("../KelimeListesi/Turkce-Kelime-Listesi/turkce_kelime_listesi.txt", "r", encoding="utf-8") as dosya:
+    satirlar = [satir.strip() for satir in dosya]
 
-for harf in kelime:
+word_vector_space = []
 
-    idx = char_to_id[harf]
+for kelime in satirlar:
 
-    vectors.append(embedding_matrix[idx])
+    vectors = []
 
-print(np.array(vectors))
+    for harf in kelime:
+
+        idx = char_to_id[harf]
+
+        vectors.append(embedding_matrix[idx])
+
+    print(np.array(vectors))
+
+    word_matrix = np.array(vectors)
+
+    word_vector = np.mean(word_matrix, axis=0)
+    word_vector_space.append(word_vector)
+
+word_vector_space_arr = np.array(word_vector_space)
+print(word_vector_space_arr.shape)
+np.save("word_vectors.npy", word_vector_space_arr)

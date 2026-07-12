@@ -1,6 +1,6 @@
 import numpy as np
 
-chars = "aâbcçdefgğhıîijklmnoöprsştuûüvyzAÂBCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVYZ0123456789.,!?;:-()[]{}\"'/%&+=*@#\n\t\x85 "
+chars = "aâbcçdefgğhıîijklmnoöprsştuûüvxyzAÂBCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVXYZ0123456789.–^,!?;:-()[]{}\"'/%&+=*@#\\\n\t\x85‚'``’' "
 
 chars = sorted(set(chars))
 

@@ -1,5 +1,9 @@
 import numpy as np
 
-embedding_matrix = np.load("word_vectors.npy")
+word_matrix = np.load("word_vectors.npy")
 
-print(embedding_matrix)
+sentence_vectors = np.load("sentence_vectors.npy")
+
+print(word_matrix)
+
+print(sentence_vectors)

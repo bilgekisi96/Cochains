@@ -1,0 +1,17 @@
+                 kitap.txt
+                    |
+                    |
+              Tokenizer
+                    |
+        -----------------------
+        |                     |
+        ↓                     ↓
+   Skip-Gram              Markov
+        |                     |
+        ↓                     ↓
+word_vectors.npy       kelime geçişleri
+        |                     |
+        ----------- -----------
+                    |
+                    ↓
+              Metin üretici

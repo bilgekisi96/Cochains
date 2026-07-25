@@ -82,8 +82,8 @@ class SkipGram:
 
         lr = 0.05
         start = time.time()
-        #epochs = 1000 çok uzun zaman sürer diye 
-        epochs = 5
+        #epochs = 1000
+        epochs = 20
         for epoch in range(epochs):
 
             loss = 0
@@ -140,7 +140,7 @@ class SkipGram:
 
         #Embedding hazir
 
-        kedi_vector = self.W[self.word_to_id["kedi"]]
+        kedi_vector = self.W[self.word_to_id["yazı"]]
 
         print(kedi_vector) #öğrenilmiş kelime vektörü
 
@@ -169,6 +169,7 @@ with open("kitaptan_kelimeler.txt", "r", encoding="utf-8") as dosya:
 satirlar = [k.lower() for k in satirlar]
 
 words = [k.lower() for k in satirlar]
+words = words[:10000]
 
 # word_matrix'i yükledikten sonra CuPy dizisine dönüştür
 word_matrix_np = np.load("word_vectors_mantiksal.npy")
@@ -191,7 +192,6 @@ id_to_word = {
 }
 
 vocab_size = len(vocab)
-words = words[:10000] #sadece ilk 10000 kelimeye bak dedim epoch eğitim kolay olması için
 
 skip_gram = SkipGram(words,word_to_id,vocab_size,id_to_word)
 
@@ -215,8 +215,8 @@ def cosine(a,b):
     )
 
 
-v1 = skip_gram.W[skip_gram.word_to_id["kedi"]]
-v2 = skip_gram.W[skip_gram.word_to_id["köpek"]]
+v1 = skip_gram.W[skip_gram.word_to_id["yazı"]]
+v2 = skip_gram.W[skip_gram.word_to_id["onun"]]
 
 print(
     cosine(v1,v2)

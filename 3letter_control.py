@@ -12,3 +12,5 @@ for kelime in kelimeler:
             harf_yok.append(harf)
 
 print(set(harf_yok))
+
+# Verilen metindeki olmayan harfleri bulduk

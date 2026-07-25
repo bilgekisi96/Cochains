@@ -1,13 +1,11 @@
-
-import numpy as np
-import time
-import pickle
+import cupy as cp
 
 class SkipGram:
 
-    def __init__(self, words,word_to_id, vocab_size): 
-        self.words = words                           
+    def __init__(self, words,word_to_id, vocab_size,id_to_word):
+        self.words = words
         self.word_to_id = word_to_id
+        self.id_to_word = id_to_word
         self.vocab_size = vocab_size
 
         self.W = None
@@ -39,7 +37,7 @@ class SkipGram:
 
         print("su anda pairs")
         print(self.pairs[-1])
-        time.sleep(10)
+        # time.sleep(10) # Kaldırıldı veya yorum satırı yapıldı
 
     def embedding_matris(self):
         #Embedding Matris
@@ -47,13 +45,13 @@ class SkipGram:
         embedding_size = 8
 
 
-        self.W = np.random.randn(
+        self.W = cp.random.randn(
             self.vocab_size,
             embedding_size
         ) * 0.01
 
 
-        self.W2 = np.random.randn(
+        self.W2 = cp.random.randn(
             embedding_size,
             self.vocab_size
         ) * 0.01
@@ -74,8 +72,8 @@ class SkipGram:
 
     #Softmax
     def softmax(self,x):
-        exp = np.exp(
-            x - np.max(x)
+        exp = cp.exp(
+            x - cp.max(x)
         )
         return exp / exp.sum()
 
@@ -84,8 +82,8 @@ class SkipGram:
 
         lr = 0.05
         start = time.time()
-        epochs = 1000
-
+        #epochs = 1000 çok uzun zaman sürer diye 
+        epochs = 5
         for epoch in range(epochs):
 
             loss = 0
@@ -98,7 +96,7 @@ class SkipGram:
 
                 probs = self.softmax(scores)
 
-                loss -= np.log(
+                loss -= cp.log(
                     probs[target]
                 )
 
@@ -108,7 +106,7 @@ class SkipGram:
 
                 grad[target] -= 1
 
-                dW2 = np.outer(
+                dW2 = cp.outer(
                     hidden,
                     grad
                 )
@@ -134,7 +132,7 @@ class SkipGram:
                     f"Loss: {loss/len(self.pairs):.4f} | "
                     f"Geçen: {elapsed:.1f}s | "
                     f"Kalan: {eta:.1f}s"
-                )    
+                )
 
             if epoch % 100 == 0:
                 print(epoch, loss)
@@ -145,15 +143,16 @@ class SkipGram:
         kedi_vector = self.W[self.word_to_id["kedi"]]
 
         print(kedi_vector) #öğrenilmiş kelime vektörü
-        
-        np.savez(
+
+        # CuPy dizilerini NumPy'a dönüştürerek kaydet
+        cp.savez(
             "skipgram_model.npz",
-            W=self.W,
-            W2=self.W2
+            W=self.W.get(), # .get() ile CPU'ya aktar
+            W2=self.W2.get() # .get() ile CPU'ya aktar
         )
         model = {
-            "W": self.W,
-            "W2": self.W2,
+            "W": self.W.get(),
+            "W2": self.W2.get(),
             "word_to_id": self.word_to_id,
             "id_to_word": self.id_to_word,
         }
@@ -161,21 +160,21 @@ class SkipGram:
         with open("skipgram.pkl", "wb") as f:
             pickle.dump(model, f)
 
-        #Hangi kelime anlam olarak birbirine yakın cevabı ?
 
 
-
-
-with open("../KelimeListesi/Kitaptan_Kelimeler/kitaptan_kelimeler.txt", "r", encoding="utf-8") as dosya:
+# Existing code logic, updated to use CuPy
+with open("kitaptan_kelimeler.txt", "r", encoding="utf-8") as dosya:
     satirlar = [satir.strip() for satir in dosya]
 
 satirlar = [k.lower() for k in satirlar]
 
 words = [k.lower() for k in satirlar]
 
-word_matrix = np.load("word_vectors_mantiksal.npy")
+# word_matrix'i yükledikten sonra CuPy dizisine dönüştür
+word_matrix_np = np.load("word_vectors_mantiksal.npy")
+word_matrix = cp.asarray(word_matrix_np) # CuPy'ye dönüştür
 
-word_vectors = {kelime: vektor for kelime, vektor in zip(satirlar, word_matrix)}
+word_vectors = {kelime: vektor for kelime, vektor in zip(satirlar, word_matrix.get())} # Eğer CPU'da işlem gerekiyorsa .get() kullan
 
 word_to_id = word_vectors
 
@@ -191,11 +190,10 @@ id_to_word = {
     for w, i in word_to_id.items()
 }
 
-#id_to_word = {i:w for w,i in word_to_id.items()}
-
 vocab_size = len(vocab)
+words = words[:10000] #sadece ilk 10000 kelimeye bak dedim epoch eğitim kolay olması için
 
-skip_gram = SkipGram(words,word_to_id,vocab_size)
+skip_gram = SkipGram(words,word_to_id,vocab_size,id_to_word)
 
 skip_gram.pairsf()
 skip_gram.embedding_matris()
@@ -207,11 +205,13 @@ print("Test Cosine")
 # #Test Cosine
 
 def cosine(a,b):
-
-    return np.dot(a,b) / (
-        np.linalg.norm(a)
+    # Cosine benzerliği için CuPy dizilerini NumPy'a dönüştürerek işlem yap
+    a_np = a.get() if isinstance(a, cp.ndarray) else a
+    b_np = b.get() if isinstance(b, cp.ndarray) else b
+    return np.dot(a_np,b_np) / (
+        np.linalg.norm(a_np)
         *
-        np.linalg.norm(b)
+        np.linalg.norm(b_np)
     )
 
 
@@ -222,6 +222,5 @@ print(
     cosine(v1,v2)
 )
 
-
-
-#Metin üretiminde Hem markov hem Embedding kullanılacak 
+# Bu kod gpu kullanımı ve işlem hızını arttırmak için düzenlendi ...
+#Metin üretiminde Hem markov hem Embedding kullanılacak

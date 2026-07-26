@@ -1,0 +1,28 @@
+v0.1
+------
+6060 kelime
+8 boyut
+
+↓
+
+v0.2
+------
+100.000 kelime
+64 boyut
+
+↓
+
+v0.3
+------
+1.000.000 kelime
+128 boyut
+
+↓
+
+v1.0
+------
+10.000.000+
+128 veya 256 boyut
+Sentence Vector
+Semantic Search
+Markov

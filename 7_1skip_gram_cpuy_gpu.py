@@ -179,7 +179,7 @@ word_vectors = {kelime: vektor for kelime, vektor in zip(satirlar, word_matrix.g
 
 word_to_id = word_vectors
 
-vocab = sorted(set(words))
+vocab = set(words)
 
 word_to_id = {
     w: i

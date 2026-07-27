@@ -26,7 +26,7 @@ scores = (W @ query) / (
     np.linalg.norm(W, axis=1) * np.linalg.norm(query) # cosine sim
 )
 
-indices = np.argsort(scores)[::-1] 
+indices = np.argsort(scores)[::-1]  #scora göre sıralama
 
-for i in indices[:10]:
+for i in indices[:10]: # en üstten 10 kelimenin indicate edilmesi
     print(index_to_word[i], scores[i])

@@ -57,7 +57,8 @@ class SkipGram:
         ) * 0.01
 
 
-
+    def sigmoid(self,x): #softmax hesabının ağır yükünden kurtulmak ve tüm sözlüğü dolaşmamak için sigmoid hesabı yapılıyor.
+        return 1 / (1 + cp.exp(-x))
 
     def forward(self):
         #Forward
@@ -79,7 +80,7 @@ class SkipGram:
 
     def gradient(self):
         #Gradient Desent Eğitim döngüsü
-
+        
         lr = 0.05
         start = time.time()
         #epochs = 1000
